@@ -11,7 +11,9 @@ from internetarchive.config import parse_config_file
 from datetime import datetime
 from yt_dlp import YoutubeDL
 from .utils import (get_itemname, check_is_file_empty,
-                    EMPTY_ANNOTATION_FILE)
+                    EMPTY_ANNOTATION_FILE,
+                    scrub_ip_addresses, scrub_ip_addresses_from_file,
+                    TEXT_SIDECAR_EXTENSIONS)
 from logging import getLogger
 from urllib.parse import urlparse
 
@@ -342,6 +344,11 @@ class TubeUp(object):
         with open(json_metadata_filepath, 'r', encoding='utf-8') as f:
             vid_meta = json.load(f)
 
+        # Scrub IP addresses from info.json to prevent leaking user IP
+        vid_meta = scrub_ip_addresses(vid_meta)
+        with open(json_metadata_filepath, 'w', encoding='utf-8') as f:
+            json.dump(vid_meta, f, indent=2, ensure_ascii=False)
+
         # Exit if video download did not complete, don't upload .part files to IA
         for ext in ['*.part.*', '*.f303.*', '*.f302.*', '*.ytdl.*', '*.f251.*', '*.248.*',
                     '*.f247.*', '*.temp.*', '*.temp', '*.part', '*.ytdl']:
@@ -368,6 +375,14 @@ class TubeUp(object):
              vid_meta['annotations'] in {'', EMPTY_ANNOTATION_FILE}) or
                 check_is_file_empty(annotations_file_path))):
             os.remove(annotations_file_path)
+
+        # Scrub IP addresses from all text sidecar files before upload
+        for file_path in glob.glob(videobasename + '*'):
+            if file_path.endswith(TEXT_SIDECAR_EXTENSIONS):
+                try:
+                    scrub_ip_addresses_from_file(file_path)
+                except (OSError, IOError, UnicodeDecodeError):
+                    pass
 
         # Upload all files with videobase name: e.g. video.mp4,
         # video.info.json, video.srt, etc.
