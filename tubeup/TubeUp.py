@@ -369,16 +369,6 @@ class TubeUp(object):
                 check_is_file_empty(annotations_file_path))):
             os.remove(annotations_file_path)
 
-        # Upload all files with videobase name: e.g. video.mp4,
-        # video.info.json, video.srt, etc.
-        files_to_upload = glob.glob(videobasename + '*')
-
-        # Upload the item to the Internet Archive
-        item = internetarchive.get_item(itemname)
-
-        if custom_meta:
-            metadata.update(custom_meta)
-
         # Parse internetarchive configuration file.
         parsed_ia_s3_config = parse_config_file(self.ia_config_path)[2]['s3']
         s3_access_key = parsed_ia_s3_config['access']
@@ -392,6 +382,16 @@ class TubeUp(object):
             if self.verbose:
                 print(msg)
             raise Exception(msg)
+
+        # Upload all files with videobase name: e.g. video.mp4,
+        # video.info.json, video.srt, etc.
+        files_to_upload = glob.glob(videobasename + '*')
+
+        # Upload the item to the Internet Archive
+        item = internetarchive.get_item(itemname)
+
+        if custom_meta:
+            metadata.update(custom_meta)
 
         item.upload(files_to_upload, metadata=metadata, retries=9001,
                     request_kwargs=dict(timeout=(9001, 9001)), delete=True,
