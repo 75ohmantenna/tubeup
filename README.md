@@ -41,15 +41,7 @@ Then run:
 ```
    pipx install "yt-dlp[default,curl-cffi]" internetarchive tubeup
 ```
-To use a nightly yt-dlp build, inject it into your yt-dlp virtual environment:
 
-```
-pipx inject yt-dlp "yt-dlp[default,curl-cffi] @ https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/download/[NIGHTLY TAG]/yt-dlp.tar.gz" --force
-```
-
-Where `[NIGHTLY TAG]` would for example be `2025.10.11.232807` in [this yt-dlp release](https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/tag/2025.10.11.232807).
-
-Upgrades will take it to latest nightly, which yt-dlp releases with a stable tag (see notes about upgrading below).
 
 3. If you don't already have an Internet Archive account, [register for one](https://archive.org/account/login.createaccount.php) to give the script upload privileges.
 
@@ -74,12 +66,22 @@ Once configured to upload, you're ready to go.
    `http://archive.org/details/@YOURUSERNAME`.
 
 
-Perodically *before* running, upgrade `tubeup` and its dependencies by running:
+7. Upgrading
+
+Perodically *before* running, upgrade `tubeup` its pyton dependencies and Deno by running:
 
 ```
-   pipx upgrade-all
+   pipx upgrade-all ; deno upgrade
+```
+To use a nightly yt-dlp build, inject it into your yt-dlp virtual environment:
+
+```
+   pipx inject yt-dlp "yt-dlp[default,curl-cffi] @ https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/download/[NIGHTLY TAG]/yt-dlp.tar.gz" --force
 ```
 
+Where `[NIGHTLY TAG]` would for example be `2025.10.11.232807` in [this yt-dlp release](https://github.com/yt-dlp/yt-dlp-nightly-builds/releases/tag/2025.10.11.232807).
+
+Upgrades will take it to latest nightly, which yt-dlp releases with a stable tag (see notes about upgrading below).
 
 ## Docker
 
